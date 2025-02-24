@@ -3,6 +3,7 @@ import axios from "axios";
 import Pagination from "../components/Pagination";
 import ProductModal from "../components/ProductModal";
 import DelProductModal from "../components/DelProductModal";
+import Toast from "../components/Toast";
 
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
@@ -24,7 +25,7 @@ const defaultModalState = {
 
 
 
-function ProductPage(){
+function ProductPage({setIsAuth}){
 
     useEffect(() => {
     //從cookie取得token
@@ -64,6 +65,17 @@ function ProductPage(){
             getProducts(page);
         }
 
+        const handleLogout = async() => {
+            try {
+                const handleLogoutres = await axios.post(`${BASE_URL}/v2/logout`);
+                console.log("登出成功",handleLogoutres.data);
+                setIsAuth(false);
+            } catch (error) {
+                alert("登出失敗");
+            }
+        };
+
+
     const handleOpenProductModal = (mode, product) => {
     setModalMode(mode);
     switch (mode) {
@@ -89,7 +101,14 @@ function ProductPage(){
   
     return(
         <>
-            <div className="container py-5">         
+            <div className="container py-5">
+                <div className="row mb-3">
+                    <div className="justify-content-end">
+                        <button onClick={()=>{handleLogout()}} type="button" className="btn btn-secondary">
+                        登出
+                        </button>
+                    </div>
+                </div>      
                 <div className="row">   
                     <div className="col">   
                         <div className="d-flex justify-content-between">  
@@ -158,6 +177,8 @@ function ProductPage(){
             
 
             <DelProductModal getProducts={getProducts} isOpen={isDelProductModalOpen} setIsOpen={setIsDelProductModalOpen} tempProduct={tempProduct}/>
+
+            <Toast />
         </>
     )
 }

@@ -1,12 +1,15 @@
 import { useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { Modal } from "bootstrap";
+import { useDispatch } from "react-redux";
+import { pushMessage } from "../slice/toastSlice";
 
 const BASE_URL = import.meta.env.VITE_BASE_URL;
 const API_PATH = import.meta.env.VITE_API_PATH;
 
 function ProductModal({modalMode,tempProduct,isOpen,setIsOpen,getProducts}){
 
+    const dispatch = useDispatch();
     const [modalData,setModalData]= useState(tempProduct);
 
     useEffect(()=>{
@@ -71,7 +74,14 @@ const createProduct = async () => {
         },
         });
     } catch (error) {
-    alert("新增產品失敗");
+    // alert("新增產品失敗");
+
+    const{ message } = error.response.data;
+
+    dispatch(pushMessage({
+        text:message.join("、"),
+        status:"failed"
+    }))
 }
 };
 const updateProduct = async () => {
@@ -87,6 +97,11 @@ const updateProduct = async () => {
             },
         }
         );
+
+        dispatch(pushMessage({
+            text:"編輯產品成功",
+            status:"success"
+        }))
     } catch (error) {
         alert("編輯產品失敗");
 }
@@ -201,7 +216,6 @@ const handleUpdateProduct = async () => {
                                         placeholder={`圖片網址 ${index + 1}`}
                                         className="form-control mb-2"
                                         /> 
-                                        {/* onChange={(e) => handleImageChange(e, index)} */}
                                         {image && (
                                         <img
                                             src={image}
